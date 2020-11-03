@@ -191,6 +191,10 @@ class StatementVisitor(metaclass=ABCMeta):
         pass # :nocov:
 
     @abstractmethod
+    def on_Live(self, stmt):
+        pass # :nocov:
+
+    @abstractmethod
     def on_Switch(self, stmt):
         pass # :nocov:
 
@@ -213,6 +217,8 @@ class StatementVisitor(metaclass=ABCMeta):
             new_stmt = self.on_Assume(stmt)
         elif type(stmt) is Cover:
             new_stmt = self.on_Cover(stmt)
+        elif type(stmt) is Live:
+            new_stmt = self.on_Live(stmt)
         elif isinstance(stmt, Switch):
             # Uses `isinstance()` and not `type() is` because nmigen.compat requires it.
             new_stmt = self.on_Switch(stmt)
@@ -247,6 +253,9 @@ class StatementTransformer(StatementVisitor):
 
     def on_Cover(self, stmt):
         return Cover(self.on_value(stmt.test), _check=stmt._check, _en=stmt._en)
+
+    def on_Live(self, stmt):
+        return Live(self.on_value(stmt.test), _check=stmt._check, _en=stmt._en)
 
     def on_Switch(self, stmt):
         cases = OrderedDict((k, self.on_statement(s)) for k, s in stmt.cases.items())
@@ -401,6 +410,7 @@ class DomainCollector(ValueVisitor, StatementVisitor):
     on_Assert = on_property
     on_Assume = on_property
     on_Cover  = on_property
+    on_Live   = on_property
 
     def on_Switch(self, stmt):
         self.on_value(stmt.test)
@@ -606,6 +616,7 @@ class SwitchCleaner(StatementVisitor):
     on_Assert = on_ignore
     on_Assume = on_ignore
     on_Cover  = on_ignore
+    on_Live   = on_ignore
 
     def on_Switch(self, stmt):
         cases = OrderedDict((k, self.on_statement(s)) for k, s in stmt.cases.items())
@@ -661,6 +672,7 @@ class LHSGroupAnalyzer(StatementVisitor):
     on_Assert = on_property
     on_Assume = on_property
     on_Cover  = on_property
+    on_Live   = on_property
 
     def on_Switch(self, stmt):
         for case_stmts in stmt.cases.values():
@@ -696,6 +708,7 @@ class LHSGroupFilter(SwitchCleaner):
     on_Assert = on_property
     on_Assume = on_property
     on_Cover  = on_property
+    on_Live   = on_property
 
 
 class _ControlInserter(FragmentTransformer):

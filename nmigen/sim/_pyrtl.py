@@ -374,6 +374,9 @@ class _StatementCompiler(StatementVisitor, _Compiler):
     def on_Cover(self, stmt):
         raise NotImplementedError # :nocov:
 
+    def on_Live(self, stmt):
+        raise NotImplementedError # :nocov:
+
     @classmethod
     def compile(cls, state, stmt):
         output_indexes = [state.get_signal(signal) for signal in stmt._lhs_signals()]

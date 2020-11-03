@@ -748,6 +748,7 @@ class _StatementCompiler(xfrm.StatementVisitor):
     on_Assert = on_property
     on_Assume = on_property
     on_Cover  = on_property
+    on_Live   = on_property
 
     def on_Switch(self, stmt):
         self._check_rhs(stmt.test)

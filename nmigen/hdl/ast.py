@@ -19,7 +19,7 @@ __all__ = [
     "UserValue",
     "Sample", "Past", "Stable", "Rose", "Fell", "Initial",
     "Statement", "Switch",
-    "Property", "Assign", "Assert", "Assume", "Cover",
+    "Property", "Assign", "Assert", "Assume", "Cover", "Live",
     "ValueKey", "ValueDict", "ValueSet", "SignalKey", "SignalDict", "SignalSet",
 ]
 
@@ -1429,6 +1429,16 @@ class Assume(Property):
 class Cover(Property):
     _kind = "cover"
 
+@final
+class Live(Property):
+    """Liveness check, which means that the condition must hold infinetly often.
+    In other words, it fails by finding a cyclic sequence of states in which
+    the condition never holds.
+
+    Useful, for instance, for detecting stuck state machines, or guaranteeing
+    a response from any request in an arbitrary, but finite, time.
+    """
+    _kind = "live"
 
 # @final
 class Switch(Statement):
